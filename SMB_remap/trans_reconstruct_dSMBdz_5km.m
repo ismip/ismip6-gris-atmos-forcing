@@ -5,7 +5,8 @@ clear
 addpath('../toolbox')
 
 % Model
-amod = 'OBS';
+%amod = 'OBS';
+amod = 'IMAUICE';
 
 % Parameters
 flg_weigh = 1;

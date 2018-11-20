@@ -5,7 +5,8 @@ clear
 addpath('../toolbox')
 
 % Model
-amod = 'OBS';
+%amod = 'OBS';
+amod = 'IMAUICE';
 
 % Parameters
 flg_weigh = 1;
@@ -41,6 +42,7 @@ if (iscen ==5)
     lookup = ncload('../Data/lookup/TDSMB_trans_lookup_MAR37_b25.nc');
     modscen='MAR37';
 end
+
 % dummy lookup for zero
 dummy0 = lookup.aSMB_ltbl(:,1,1);
 
@@ -57,16 +59,16 @@ ima=nc1.sftgif;
 lat=d0.lat;
 nt=length(lookup.time);
 
-bint_re=zeros(nb,nt);
-
 % output array
 tdsmb_re=zeros(size(d0.aSMB));
+bint_out=zeros(size(lookup.bint));
 
 %for t=1:5 % year loop
 for t=1:nt % year loop
 
     dsd=d0.aSMB(:,:,t);
     dsd_re=zeros(size(dsd));
+    bint=zeros(1,nb);
 
     %% loop through basins
     for b=1:nb
@@ -121,25 +123,17 @@ for t=1:nt % year loop
         end
 %    shade(dsd_b)
 
-        %% extended integral dsmb for this basin
-        dsd_ex = dsd.*ima_b;
-        bint_ex(b)=nansum(nansum(dsd_ex.*af2))*dx*dy;
-        
-        %% integral dsmb for this basin
-        bint_re(b)=nansum(nansum(dsd_b.*af2))*dx*dy;
-
-        %% check integral again 
-        bint_out(b)=nansum(nansum(dsd_b.*af2))*dx*dy;
-
         %% replace nan by zeros to add all basins together
         dsd_b(isnan(dsd_b))=0;
         dsd_re = dsd_re+dsd_b;
+        bint(b)=nansum(nansum(dsd_b.*af2.*ima_b))*dx*dy;
 
     end
     %% end basin loop
 
     %% collect results
     tdsmb_re(:,:,t) = dsd_re;    
+    bint_out(:,t)=bint(:);
 
 
     if (flg_plot) 
@@ -160,3 +154,13 @@ end
 %% end time loop
 
 ncwrite_GrIS(['../Models/' amod '/TDSMB_' modscen '_' amod '.nc'], tdsmb_re, 'DSMB',{'x','y','time'},5)
+
+% Plot
+figure
+bar(1e-9*[lookup.bint(:,nt), bint_out(:,nt),])
+axis tight
+%axis([0,26,-100,0])
+ylabel('Integrated DSMB [km^3]')
+legend({'original','reconstructed'},'Location','southeast')
+xlabel('Basin Id')
+print('-dpng', '-r300', ['../Models/' amod '/dsmb_basinint_' modscen '_re']) 
