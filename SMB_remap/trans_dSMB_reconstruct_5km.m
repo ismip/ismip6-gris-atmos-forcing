@@ -4,6 +4,9 @@ clear
 
 addpath('../toolbox')
 
+% Model
+amod = 'OBS';
+
 % Parameters
 flg_weigh = 1;
 
@@ -28,11 +31,8 @@ load ../Data/Grid/af_e05000m.mat af2
 % dim
 dx=5000;dy=5000;
 
-% masks
-obs=ncload('../Data/Grid/obs1_05.nc');
-
 % basin weights
-load ../Data/Basins/ExtBasinScale25_div6_50 wbas
+load ../Data/Basins/ExtBasinScale25_nn7_50.mat wbas
 
 % Forcing scenario
 if (iscen ==5)
@@ -41,21 +41,18 @@ if (iscen ==5)
     lookup = ncload('../Data/lookup/TDSMB_trans_lookup_MAR37_b25.nc');
     modscen='MAR37';
 end
+% dummy lookup for zero
+dummy0 = lookup.aSMB_ltbl(:,1,1);
 
 % Load a modelled geometry for reconstruction
-amod = 'VUBGISM';
-nc=ncload(['../Models/' amod '/lithk_05000m.nc']);
-nc1=ncload(['../Models/' amod '/topg_05000m.nc']);
-nc2=ncload(['../Models/' amod '/sftgif_05000m.nc']);
+nc=ncload(['../Models/' amod '/orog_05000m.nc']);
+nc1=ncload(['../Models/' amod '/sftgif_05000m.nc']);
 
 % Operate on ice thickness
-%thi = nc.lithk.*nc2.sftgif;
-thi = nc.lithk; thi(isnan(thi))=0;
-bed = nc1.topg;
-sur = max(0,bed+thi);
+%sur = nc.orog.*nc1.sftgif;
+sur = max(0,nc.orog);
 
-ima=nc2.sftgif;
-mask=nc2.sftgif;
+ima=nc1.sftgif;
 
 lat=d0.lat;
 nt=length(lookup.time);
@@ -77,14 +74,35 @@ for t=1:nt % year loop
         eval(['sur_b=sur.*(bas.basin' num2str(b) './bas.basin' num2str(b) ');']);
         eval(['ima_b=ima.*(bas.basin' num2str(b) './bas.basin' num2str(b) ');']);
 
-        look0=lookup.aSMB_ltbl(:,wbas.n0(b),t);
         %% set neighbor basin and lookup
-        look1=lookup.aSMB_ltbl(:,wbas.n1(b),t);
-        look2=lookup.aSMB_ltbl(:,wbas.n2(b),t);
-        look3=lookup.aSMB_ltbl(:,wbas.n3(b),t);
-        look4=lookup.aSMB_ltbl(:,wbas.n4(b),t);
-        look5=lookup.aSMB_ltbl(:,wbas.n5(b),t);
-        look6=lookup.aSMB_ltbl(:,wbas.n6(b),t);
+        look0 = dummy0;
+        if (wbas.n0(b)>0)
+            look0=lookup.aSMB_ltbl(:,wbas.n0(b),t);
+        end
+        look1 = dummy0;
+        if (wbas.n1(b)>0)
+            look1=lookup.aSMB_ltbl(:,wbas.n1(b),t);
+        end
+        look2 = dummy0;
+        if (wbas.n2(b)>0)
+            look2=lookup.aSMB_ltbl(:,wbas.n2(b),t);
+        end
+        look3 = dummy0;
+        if (wbas.n3(b)>0)
+            look3=lookup.aSMB_ltbl(:,wbas.n3(b),t);
+        end
+        look4 = dummy0;
+        if (wbas.n4(b)>0)
+            look4=lookup.aSMB_ltbl(:,wbas.n4(b),t);
+        end
+        look5 = dummy0;
+        if (wbas.n5(b)>0)
+            look5=lookup.aSMB_ltbl(:,wbas.n5(b),t);
+        end
+        look6 = dummy0;
+        if (wbas.n6(b)>0)
+            look6=lookup.aSMB_ltbl(:,wbas.n6(b),t);
+        end
         
         %% use lookup table to determine DSMB
         dsd_b0 = interp1(lookup.z,look0(:),sur_b);
@@ -107,9 +125,6 @@ for t=1:nt % year loop
         dsd_ex = dsd.*ima_b;
         bint_ex(b)=nansum(nansum(dsd_ex.*af2))*dx*dy;
         
-        %% mask
-        %dsd_b = dsd_b.*mask;
-
         %% integral dsmb for this basin
         bint_re(b)=nansum(nansum(dsd_b.*af2))*dx*dy;
 
@@ -133,7 +148,6 @@ for t=1:nt % year loop
         caxis([-4,1])
         print('-dpng', '-r300', ['dsmb_' modscen '_re' sprintf('%02d',t)]) 
         close
-%        shade_bg(dsd.*mask)
         shade_bg(dsd)
         colormap(cmap)
         caxis([-4,1])
