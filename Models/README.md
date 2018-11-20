@@ -1,8 +1,6 @@
 # Sub-directories for each model (initial state)
 Need to contain the initial ice geometry and mask to start with
-`lithk_05000m.nc`
-
-`topg_05000m.nc`
+`orog_05000m.nc`
 
 `sftgif_05000m.nc`
 

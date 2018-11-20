@@ -1,4 +1,4 @@
-% save basin info
+% Save basins in useful mask format 
 clear
 
 bas=ncload('../Data/Basins/ISMIP6Masks25_05000m.nc');
@@ -24,6 +24,11 @@ for i=1:25
     bc(2,i)=nanmedian(ycb(:));
     bc(1,i)=nanmedian(xcb(:));
 end
+
+% make a zero basin id
+bas.basinIDs(1,1)=0;
+bas.basin0=bas.basin1*0;
+bas.basin0(1,1) = 1;
 
 % Plotting
 shade(bas.basinIDs)

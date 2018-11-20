@@ -7,10 +7,9 @@
 
 ```cp <ExtArchive>/ISMIP6_Extensions.nc ../Data/Basins/```
 
-```cp <ExtArchive>/obs1_05.nc ../Data/Grid/```
-
 ```cp <ExtArchive>/af_e05000m.mat ../Data/Grid/```
 
+```cp <ExtArchive>/orog_05000m.nc ../Model/OBS/```
 
 ### Prepare Basins (done only once)
 

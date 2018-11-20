@@ -1,7 +1,9 @@
-% save basin connection info
+% Calculate basin weights
 % For given basin, give neighbors and scaling factors according to distance
 % include weighting across divide, other basins
 clear
+
+addpath('../toolbox')
 
 % Params
 % falloff distance and resolution in km
@@ -12,21 +14,41 @@ res = 5;
 load ../Data/Basins/ExtBasinMasks25 
 [y,x]= meshgrid(1:size(bas.basin1,2),1:size(bas.basin1,1));
 
+nx = size(y,1);
+ny = size(y,2);
+
+% find neighbors
+all_nids = zeros(25,25);
+for k=1:25
+    all_nids_bas = [];
+    for i=2:(nx-1)
+        for j=2:(ny-1)
+            if (bas.basinIDs(i,j) == k)
+                nids = [bas.basinIDs(i+1,j),bas.basinIDs(i-1,j),bas.basinIDs(i,j+1),bas.basinIDs(i,j-1),bas.basinIDs(i+1,j+1),bas.basinIDs(i+1,j-1),bas.basinIDs(i-1,j-1),bas.basinIDs(i-1,j-1)];
+                all_nids_bas= unique([all_nids_bas, nids]);
+            end
+        end
+    end
+    all_nids_bas = all_nids_bas(all_nids_bas~=k);
+    all_nids(k,1:length(all_nids_bas)) = all_nids_bas;
+end
+%all_nids
+
 % basin id
 bas.ids = 1:25;
-bas.n0 =  [ 1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25];
+bas.n0 =  1:25;
 % locking to the coast left neighbor
-bas.n1 =  [25, 1:24];
+bas.n1 =  all_nids(:,1)';
 % locking to the coast right neighbor
-bas.n2 =  [ 2:25, 1];
+bas.n2 =  all_nids(:,2)';
 % Any other basins of interest? 
-bas.n3 =  [24  4 13  2 22 13 19 18 18 17 16 15 25 12 12 11  9  8  7  7  5  5  4  1 13];
+bas.n3 =  all_nids(:,3)';
 % Any other basins of interest? 
-bas.n4 =  [ 4 24 13 24 23 13  5 17 17 16 15 14 25 25 11 10 10  9  5  5  7  7  5  2 13];
+bas.n4 =  all_nids(:,4)';
 % Any other basins of interest? 
-bas.n5 =  [23 23 13 23 21 13 18 13 13 13 13 25 25 25 25 25  8  7 21 22 19 19  2  4 13];
+bas.n5 =  all_nids(:,5)';
 % Any other basins of interest? 
-bas.n6 =  [13 13 13  1  7 13 20 13 13 13 13 25 25 25 25 25 25 25 25 25 25  4  1 13 13];
+bas.n6 =  all_nids(:,6)';
 
 bas.basn = [bas.n0; bas.n1; bas.n2; bas.n3; bas.n4; bas.n5; bas.n6];
 % number of neighbors including basin itself
@@ -124,7 +146,7 @@ bas.wbasWGTs(:,:,7) = bas.wgc6;
 
 % Write out 
 wbas = bas;
-save(['../Data/Basins/ExtBasinScale25_div6_' num2str(foff)], 'wbas');
+save(['../Data/Basins/ExtBasinScale25_nn7_' num2str(foff)], 'wbas');
 
 %%% Write in netcdf
 % BasinIDs
@@ -133,8 +155,10 @@ wbas.wbasIDs = zeros(size(wbas.basinIDs,1),size(wbas.basinIDs,2),wbas.nn);
 for i=1:size(wbas.basinIDs,1)
     for j=1:size(wbas.basinIDs,2)
         in = wbas.basinIDs(i,j);
-        for n = 1:wbas.nn
-            wbas.wbasIDs(i,j,n) = wbas.basn(n,in);
+        if (in > 0)
+            for n = 1:wbas.nn
+                wbas.wbasIDs(i,j,n) = wbas.basn(n,in);
+            end
         end
     end
 end
