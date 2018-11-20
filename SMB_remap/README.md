@@ -5,9 +5,9 @@
 
 `matlab`
 
-`trans_dSMB__reconstruct_5km.m`
+`trans_reconstruct_DSMB_5km.m`
 
-`trans_dSMBdz_reconstruct_5km.m`
+`trans_reconstruct_dSMBdz_5km.m`
 
 --> ../Model/<MODEL>/TDSMB_<scenario>_<MODEL>.nc
 
