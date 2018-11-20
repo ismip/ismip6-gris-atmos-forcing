@@ -1,4 +1,4 @@
-% time dependent approximation for dsmb
+% Create time dependent lookup table for a given RCM simulation
 
 clear
 
@@ -6,7 +6,7 @@ addpath('../toolbox')
 
 %%%% ! Note special treatment of some basins below !!!
 
-% fill with nan for high elevation?
+% replace nan for high elevation with last finite value?
 flg_nanfill = 1;
 
 colors=get(0,'DefaultAxesColorOrder');
@@ -20,9 +20,7 @@ load ../Data/Grid/af_e05000m.mat af2
 % dim
 dx=5000;dy=5000;
 
-% masks
-obs=ncload('../Data/Grid/obs1_05.nc');
-
+% scenario
 iscen = 5;
 
 if (iscen ==5)
@@ -31,7 +29,6 @@ lookup_file='trans_lookup_MAR37_b25';
 end
 
 sur=d0.topg;
-mask=obs.zmask;
 lat=d0.lat;
 time=d0.time;
 nt=length(time);
@@ -51,7 +48,7 @@ bint=zeros(nb,nt);
 for t=1:nt % year loop
            
 
-    dsd=d0.aSMB(:,:,t).*(mask./double(mask));
+    dsd=d0.aSMB(:,:,t);
 
 %    figure
     for b=1:nb
@@ -102,20 +99,13 @@ for t=1:nt % year loop
         
     end % end basin loop
     %% manual correction for some basins needed?
-%    table(12,2,29:end) = table(12,2,28);
+    if(t==nt)
+        warning('Manual corrections active, check !!!'); 
+    end
+    table(9,32:end,t) = table(9,31,t);
+    table(7,35:end,t) = table(7,34,t);
 
 end % end year loop
-
-lookup.table = table;
-
-%% add basin totals to lookup
-lookup.bint = bint;
-lookup.ss = ss;
-lookup.ds = ds;
-lookup.time = time;
-
-%% write lookup table for model/scenario
-%save(lookup_file,'lookup')
 
 %% Write netcdf
 nz = length(ss);
@@ -125,4 +115,8 @@ nt = length(td);
 % permute to get dsmb_table(h,b,t)
 table_out = permute(table,[2,1,3]);
 
-ncwrite_TDSMBTable(['../Data/lookup/TDSMB_' lookup_file '.nc'],ss,td,table_out,'aSMB_ltbl',{'z','b','time'});
+% Write netcdf
+ancfile = ['../Data/lookup/TDSMB_' lookup_file '.nc'];
+ncwrite_TDSMBTable(ancfile,ss,td,table_out,'aSMB_ltbl',{'z','b','time'});
+nccreate(ancfile,'bint','Dimensions',{'b',nb,'time',nt}, 'Datatype','single', 'Format','classic');
+ncwrite(ancfile,'bint',bint);
