@@ -11,6 +11,8 @@
 
 ```cp <ExtArchive>/orog_05000m.nc ../Model/OBS/```
 
+```cp <ExtArchive>/sftgif_05000m.nc ../Model/OBS/```
+
 ### Prepare Basins (done only once)
 
 `./make_masks.sh`
