@@ -160,4 +160,10 @@ for t=1:nt % year loop
 end
 %% end time loop
 
+ancfile = ['../Models/' amod '/TdSMBdz_' modscen '_' amod '.nc'];
 ncwrite_GrIS(['../Models/' amod '/TdSMBdz_' modscen '_' amod '.nc'], tdsmb_re, 'TdSMBdz',{'x','y','time'},5)
+% time
+nccreate(ancfile,'time','Dimensions',{'time',nt}, 'Datatype','single', 'Format','classic');
+ncwrite(ancfile,'time',lookup.time);
+ncwriteatt(ancfile,'time', 'units', 'seconds') ;
+ncwriteatt(ancfile,'time', 'axis', 'time') ;

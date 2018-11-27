@@ -153,7 +153,13 @@ for t=1:nt % year loop
 end
 %% end time loop
 
-ncwrite_GrIS(['../Models/' amod '/TDSMB_' modscen '_' amod '.nc'], tdsmb_re, 'DSMB',{'x','y','time'},5)
+ancfile = ['../Models/' amod '/TDSMB_' modscen '_' amod '.nc'];
+ncwrite_GrIS(ancfile, tdsmb_re, 'DSMB',{'x','y','time'},5)
+% time
+nccreate(ancfile,'time','Dimensions',{'time',nt}, 'Datatype','single', 'Format','classic');
+ncwrite(ancfile,'time',lookup.time);
+ncwriteatt(ancfile,'time', 'units', 'seconds') ;
+ncwriteatt(ancfile,'time', 'axis', 'time') ;
 
 % Plot
 figure

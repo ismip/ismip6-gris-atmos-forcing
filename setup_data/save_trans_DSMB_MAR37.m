@@ -12,8 +12,8 @@ d20 = ncload([pdata 'MARv3.7-yearly-MIROC5-20xx.nc']);
 DSMB = (d20.SMB(1:5:end,1:5:end)-d19.SMB(1:5:end,1:5:end))/1000;
 LAT=d19.LAT(1:5:end,1:5:end);
 SH=d19.SRF(1:5:end,1:5:end);
-dSMBdz19=d19.dRU(1:5:end,1:5:end)/1000;
-dSMBdz20=d20.dRU(1:5:end,1:5:end)/1000;
+dSMBdz19=-d19.dRU(1:5:end,1:5:end)/1000;
+dSMBdz20=-d20.dRU(1:5:end,1:5:end)/1000;
 
 % Time and amplitude
 TIME=2000:1:2100;
