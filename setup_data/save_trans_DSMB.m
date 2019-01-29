@@ -48,17 +48,17 @@ for t = 1:nt
     %% Load forcing file
     d1 = ncload([scenpath '/' file_root num2str(time(t)) '.nc']);
 
-%    %% aSMB [mmWE/yr] 
-%    aSMB = (d1.SMB(1:res:end,1:res:end)-d0.SMB(1:res:end,1:res:end));
-%    %% write out aSMB
-%    ancfile = [outpath '/' outfile_root_a  '-' num2str(time(t)) '.nc'];
-%    ncwrite_GrIS_aSMB(ancfile, aSMB, 'aSMB', {'x','y','t'}, res, time(t));
-%
-%    %% dSMB/dz [mmWE/yr /m] 
-%    dSMBdz = (d1.dSMB(1:res:end,1:res:end));
-%    %% write out dSMBdz
-%    ancfile = [outpath '/' outfile_root_d  '-' num2str(time(t)) '.nc'];
-%    ncwrite_GrIS_dSMBdz(ancfile, dSMBdz, 'dSMBdz', {'x','y','t'}, res, time(t));
+    %% aSMB [mmWE/yr] 
+    aSMB = (d1.SMB(1:res:end,1:res:end)-d0.SMB(1:res:end,1:res:end));
+    %% write out aSMB
+    ancfile = [outpath '/' outfile_root_a  '-' num2str(time(t)) '.nc'];
+    ncwrite_GrIS_aSMB(ancfile, aSMB, 'aSMB', {'x','y','t'}, res, time(t));
+
+    %% dSMB/dz [mmWE/yr /m] 
+    dSMBdz = (d1.dSMB(1:res:end,1:res:end));
+    %% write out dSMBdz
+    ancfile = [outpath '/' outfile_root_d  '-' num2str(time(t)) '.nc'];
+    ncwrite_GrIS_dSMBdz(ancfile, dSMBdz, 'dSMBdz', {'x','y','t'}, res, time(t));
 
     %% dRUN/dz [mmWE/yr /m] 
     dRUNdz = (d1.dRU(1:res:end,1:res:end));
