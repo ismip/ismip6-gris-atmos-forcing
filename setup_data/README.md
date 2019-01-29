@@ -1,17 +1,13 @@
 # Prepare input data 
 
 ### Copy input files from external archive (search ISMIP6 ftp)
-```cp <ExtArchive>/MARv3.7-yearly-MIROC5-19xx.nc ../Data/MAR/```
-
-```cp <ExtArchive>/MARv3.7-yearly-MIROC5-20xx.nc ../Data/MAR/```
-
 ```cp <ExtArchive>/ISMIP6_Extensions.nc ../Data/Basins/```
 
-```cp <ExtArchive>/af_e05000m.mat ../Data/Grid/```
+```cp <ExtArchive>/af2_ISMIP6_GrIS_01000m.nc ../Data/Grid/```
 
-```cp <ExtArchive>/orog_05000m.nc ../Model/OBS/```
+```cp <ExtArchive>/orog_01000m.nc ../Models/OBS/```
 
-```cp <ExtArchive>/sftgif_05000m.nc ../Model/OBS/```
+```cp <ExtArchive>/sftgif_01000m.nc ../Models/OBS/```
 
 ### Prepare Basins (done only once)
 
@@ -33,5 +29,5 @@
 
 % Build a forcing time series 
 
-`save_trans_DSMB_MAR37.m`
+`save_trans_DSMB.m`
 

@@ -1,7 +1,7 @@
 % Save basins in useful mask format 
 clear
 
-bas=ncload('../Data/Basins/ISMIP6Masks25_05000m.nc');
+bas=ncload('../Data/Basins/ISMIP6Masks25.nc');
 
 bas.ids = 1:25;
 bas.basinIDs=zeros(size(bas.basin1));
