@@ -29,14 +29,14 @@ af = double(da.af2);
 % res
 dx=1000;dy=1000;
 
-outpath = '../Data/dSMB';
+inpath = ['../Data/dSMB/' gcm '-' scen ];
 
 % MAR surface 
 d0 = ncload(['../Data/MAR/MARv3.9_topg_01000m.nc']);
 sur = d0.topg;
 
 % scenario specific 
-outfile_root_a = [ 'aSMB_MARv3.9-yearly-' gcm '-' scen ];
+infile_root_a = [ 'aSMB_MARv3.9-yearly-' gcm '-' scen ];
 lookup_file = ['trans_lookup_b25_MARv3.9-' gcm '-' scen ];
 
 % timer
@@ -65,7 +65,7 @@ for t = 1:nt % year loop
 %    t
     fprintf(['\b\b\b\b\b']);
     fprintf([sprintf('%02d',t), ',00']);
-    d1 = ncload([outpath '/' outfile_root_a  '-' num2str(time(t)) '.nc']);
+    d1 = ncload([inpath '/aSMB/' infile_root_a  '-' num2str(time(t)) '.nc']);
     aSMB = d1.aSMB;
     
 %    figure
@@ -129,7 +129,7 @@ end % end year loop
 
 %% Write netcdf
 nz = length(ss);
-td = (1:86)*31556926;
+td = time;
 nt = length(td);
 
 % permute to get dsmb_table(h,b,t)

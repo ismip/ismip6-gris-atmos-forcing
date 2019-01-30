@@ -69,7 +69,7 @@ ncwriteatt(ancfile,'time', 'axis', 'time') ;
 
 %% Attributes
 ncwriteatt(ancfile,'/','proj4','+init=epsg:3413')
-ncwriteatt(ancfile,'/','Description',['MAR SMB change with surface elevation. Prepared for ISMIP6 by Heiko Goelzer (h.goelzer@uu.nl), IMAU, ', date ])
+ncwriteatt(ancfile,'/','Description',['MAR Runoff change with surface elevation. Prepared for ISMIP6 by Heiko Goelzer (h.goelzer@uu.nl), IMAU, ', date ])
 ncwriteatt(ancfile,'/','MAR-contact','xavierfettweis@uliege.be')
 ncwriteatt(ancfile,'/','MAR-institute','University of Liege (Belgium)')
 
@@ -86,6 +86,6 @@ ncwriteatt(ancfile,'mapping', 'straight_vertical_longitude_from_pole', '-45') ;
 
 % Add attributes to variables
 ncwriteatt(ancfile,varname, 'units', 'kg m-2 s-1') ;
-ncwriteatt(ancfile,varname, 'long_name', 'Surface mass balance change with surface elevation') ;
+ncwriteatt(ancfile,varname, 'long_name', 'Runoff change with surface elevation') ;
 ncwriteatt(ancfile,varname, '_FillValue', 9.96921e36) ; 
 ncwriteatt(ancfile,varname, 'grid_mapping', 'mapping') ;

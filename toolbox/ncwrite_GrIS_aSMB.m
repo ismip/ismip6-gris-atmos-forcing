@@ -59,7 +59,7 @@ ncwrite(ancfile,'y',yd);
 ncwrite(ancfile,'time',time-1900);
 ncwriteatt(ancfile,'x', 'units', 'm') ;
 ncwriteatt(ancfile,'y', 'units', 'm') ;
-ncwriteatt(ancfile,'time', 'units', 'years since 1900-07-01') ;
+ncwriteatt(ancfile,'time', 'units', 'seconds since 1900-07-01') ;
 ncwriteatt(ancfile,'x', 'standard_name', 'projection_x_coordinate') ;
 ncwriteatt(ancfile,'y', 'standard_name', 'projection_y_coordinate') ;
 ncwriteatt(ancfile,'time', 'standard_name', 'time axis') ;
@@ -85,7 +85,7 @@ ncwriteatt(ancfile,'mapping', 'standard_parallel', '70.') ;
 ncwriteatt(ancfile,'mapping', 'straight_vertical_longitude_from_pole', '-45') ;
 
 % Add attributes to variables
-ncwriteatt(ancfile,varname, 'units', 'mmWE yr-1') ;
+ncwriteatt(ancfile,varname, 'units', 'kg m-2 s-1') ;
 ncwriteatt(ancfile,varname, 'long_name', 'Surface mass balance anomaly') ;
 ncwriteatt(ancfile,varname, '_FillValue', 9.96921e36) ; 
 ncwriteatt(ancfile,varname, 'grid_mapping', 'mapping') ;

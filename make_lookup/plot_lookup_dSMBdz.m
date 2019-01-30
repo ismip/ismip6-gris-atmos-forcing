@@ -20,9 +20,9 @@ for b=1:25
     subplot(5,5,b)
     hold on; box on;
     eval(['look = lookup.dSMBdz_ltbl(:,b,t);']);
-    plot(lookup.z,look(:),'-')
+    plot(lookup.z,look(:)*31556926,'-')
     title(['B' num2str(bas.ids(b)) ' ID' num2str(b) ])
-    axis([0 3300 -2 10])
+    axis([0 3300 -10 0])
 end
 end
 cb = colorbar;

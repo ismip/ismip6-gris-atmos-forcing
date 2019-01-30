@@ -119,7 +119,7 @@ lookup.time = time;
 
 %% Write netcdf
 nz = length(ss);
-td = (1:101)*31556926;
+td = (1:86)*31556926;
 nt = length(td);
 
 % permute to get dsmb_table(h,b,t)

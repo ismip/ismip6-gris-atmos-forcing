@@ -4,74 +4,97 @@ clear
 
 addpath('../toolbox')
 
+%% Settings
+
+% Scenario
+rcm = 'MARv3.9';
+gcm = 'MIROC5';
+scen = 'rcp85';
+
+%gcm = 'NorESM1';
+%scen = 'rcp85';
+
 % Model
-%amod = 'OBS';
-amod = 'IMAUICE';
+amod = 'OBS';
+%amod = 'IMAUICE08';
+
+%%%%%%%
 
 % Parameters
 flg_weigh = 1;
-
-% 0=initMIP; 1=MIROC8.5; 2=NorESM8.5; 3=CANSM8.5; 4=MIROC4.5; 5=new MIROC8.5
-iscen = 5;
 
 % flag for plotting 
 flg_plot=0;
 load cmap_dsmb
 
-colors=get(0,'DefaultAxesColorOrder');
+% scenario specific
+aSMBpath = ['../Data/dSMB/' gcm '-' scen ];
+aSMBfile_root = [ 'aSMB_MARv3.9-yearly-' gcm '-' scen ];
+outpath = ['../Models/' amod '/' gcm '-' scen ];
+outfile_root = [ 'aSMB_MARv3.9-yearly-' gcm '-' scen '-' amod ];
+
+mkdir(outpath, 'aSMB'); 
+
+secpyear = 31556926;
 
 % basin definition
-load ../Data/Basins/ExtBasinMasks25.mat
+load(['../Data/Basins/ExtBasinMasks25.mat']);
 x1 = 1:size(bas.basinIDs,1);
 y1 = 1:size(bas.basinIDs,2);
 nb = length(bas.ids);
 [y,x] = meshgrid(y1,x1);
 
 % area factors
-load ../Data/Grid/af_e05000m.mat af2
+da = ncload('../Data/Grid/af2_ISMIP6_GrIS_01000m.nc');
+af = double(da.af2);
 % dim
-dx=5000;dy=5000;
+dx=1000;dy=1000;
 
 % basin weights
-load ../Data/Basins/ExtBasinScale25_nn7_50.mat wbas
+load(['../Data/Basins/ExtBasinScale25_nn7_50.mat'], 'wbas');
 
-% Forcing scenario
-if (iscen ==5)
-    % original forcing
-    d0 = ncload('../Data/MAR/TDSMB_MAR37_MIROC5_rcp85_05000m.nc');
-    lookup = ncload('../Data/lookup/TDSMB_trans_lookup_MAR37_b25.nc');
-    modscen='MAR37';
-end
+% original forcing
+lookup = ncload('../Data/lookup/TaSMB_trans_lookup_b25_MARv3.9-MIROC5-rcp85.nc');
+modscen='MAR39';
 
 % dummy lookup for zero
 dummy0 = lookup.aSMB_ltbl(:,1,1);
 
 % Load a modelled geometry for reconstruction
-nc=ncload(['../Models/' amod '/orog_05000m.nc']);
-nc1=ncload(['../Models/' amod '/sftgif_05000m.nc']);
+nc=ncload(['../Models/' amod '/orog_01000m.nc']);
+nc1=ncload(['../Models/' amod '/sftgif_01000m.nc']);
 
 % Operate on ice thickness
 %sur = nc.orog.*nc1.sftgif;
-sur = max(0,nc.orog);
+sur = max(0,double(nc.orog));
 
-ima=nc1.sftgif;
+ima = double(nc1.sftgif);
 
-lat=d0.lat;
 nt=length(lookup.time);
+time = lookup.time;
 
-% output array
-tdsmb_re=zeros(size(d0.aSMB));
 bint_out=zeros(size(lookup.bint));
 
+msg = (['running year, basin: 00,00']);
+fprintf(msg);
 %for t=1:5 % year loop
 for t=1:nt % year loop
 
-    dsd=d0.aSMB(:,:,t);
-    dsd_re=zeros(size(dsd));
+    timestamp = (time(t)-1900)*secpyear;
+
+    fprintf(['\b\b\b\b\b']);
+    fprintf([sprintf('%02d',t), ',00']);
+    d1 = ncload([aSMBpath '/aSMB/' aSMBfile_root  '-' num2str(time(t)) '.nc']);
+
+    aSMB=d1.aSMB(:,:);
+    aSMB_re=zeros(size(aSMB));
     bint=zeros(1,nb);
 
     %% loop through basins
     for b=1:nb
+
+        fprintf(['\b\b\b']);
+        fprintf([',' sprintf('%02d',b)]);
         %% set current basin and lookup
         eval(['sur_b=sur.*(bas.basin' num2str(b) './bas.basin' num2str(b) ');']);
         eval(['ima_b=ima.*(bas.basin' num2str(b) './bas.basin' num2str(b) ');']);
@@ -107,42 +130,45 @@ for t=1:nt % year loop
         end
         
         %% use lookup table to determine DSMB
-        dsd_b0 = interp1(lookup.z,look0(:),sur_b);
-        dsd_b1 = interp1(lookup.z,look1(:),sur_b);
-        dsd_b2 = interp1(lookup.z,look2(:),sur_b);
-        dsd_b3 = interp1(lookup.z,look3(:),sur_b);
-        dsd_b4 = interp1(lookup.z,look4(:),sur_b);
-        dsd_b5 = interp1(lookup.z,look5(:),sur_b);
-        dsd_b6 = interp1(lookup.z,look6(:),sur_b);
+        aSMB_b0 = interp1(lookup.z,look0(:),sur_b);
+        aSMB_b1 = interp1(lookup.z,look1(:),sur_b);
+        aSMB_b2 = interp1(lookup.z,look2(:),sur_b);
+        aSMB_b3 = interp1(lookup.z,look3(:),sur_b);
+        aSMB_b4 = interp1(lookup.z,look4(:),sur_b);
+        aSMB_b5 = interp1(lookup.z,look5(:),sur_b);
+        aSMB_b6 = interp1(lookup.z,look6(:),sur_b);
 
         if (flg_weigh == 0)
             %% combine according to weights
-            dsd_b = dsd_b0.*wbas.wg;
+            aSMB_b = aSMB_b0.*wbas.wg;
         else
-            dsd_b = dsd_b0.*wbas.wgc0 + dsd_b1.*wbas.wgc1 + dsd_b2.*wbas.wgc2 + dsd_b3.*wbas.wgc3 + dsd_b4.*wbas.wgc4 + dsd_b5.*wbas.wgc5 + dsd_b6.*wbas.wgc6;
+            aSMB_b = aSMB_b0.*wbas.wgc0 + aSMB_b1.*wbas.wgc1 + aSMB_b2.*wbas.wgc2 + aSMB_b3.*wbas.wgc3 + aSMB_b4.*wbas.wgc4 + aSMB_b5.*wbas.wgc5 + aSMB_b6.*wbas.wgc6;
         end
-%    shade(dsd_b)
+%    shade(aSMB_b)
 
         %% replace nan by zeros to add all basins together
-        dsd_b(isnan(dsd_b))=0;
-        dsd_re = dsd_re+dsd_b;
-        bint(b)=nansum(nansum(dsd_b.*af2.*ima_b))*dx*dy;
+        aSMB_b(isnan(aSMB_b))=0;
+        aSMB_re = aSMB_re+aSMB_b;
+        bint(b)=nansum(nansum(aSMB_b.*af.*ima_b))*dx*dy;
 
     end
     %% end basin loop
 
     %% collect results
-    tdsmb_re(:,:,t) = dsd_re;    
     bint_out(:,t)=bint(:);
 
+    %% aSMB [kg m-2 s-1] 
+    %% write out aSMB
+    ancfile = [outpath '/aSMB/' outfile_root  '-' num2str(time(t)) '.nc'];
+    ncwrite_GrIS_aSMB(ancfile, aSMB_re, 'aSMB', {'x','y','t'}, 1, timestamp);
 
     if (flg_plot) 
-        shade_bg(dsd_re)
+        shade_bg(aSMB_re)
         colormap(cmap)
         caxis([-4,1])
         print('-dpng', '-r300', ['dsmb_' modscen '_re' sprintf('%02d',t)]) 
         close
-        shade_bg(dsd)
+        shade_bg(aSMB)
         colormap(cmap)
         caxis([-4,1])
         print('-dpng', '-r300', ['dsmb_' modscen '_or' sprintf('%02d',t)]) 
@@ -152,14 +178,6 @@ for t=1:nt % year loop
 
 end
 %% end time loop
-
-ancfile = ['../Models/' amod '/TDSMB_' modscen '_' amod '.nc'];
-ncwrite_GrIS(ancfile, tdsmb_re, 'DSMB',{'x','y','time'},5)
-% time
-nccreate(ancfile,'time','Dimensions',{'time',nt}, 'Datatype','single', 'Format','classic');
-ncwrite(ancfile,'time',lookup.time);
-ncwriteatt(ancfile,'time', 'units', 'seconds') ;
-ncwriteatt(ancfile,'time', 'axis', 'time') ;
 
 % Plot
 figure

@@ -1,4 +1,5 @@
-% time dependent approximation for dsmb
+% time dependent approximation for dSMBdz
+% FOr remapping this is based on runoff gradients dRUNdz!
 
 clear
 
@@ -29,14 +30,14 @@ af = double(da.af2);
 % res
 dx=1000;dy=1000;
 
-outpath = '../Data/dSMB';
+inpath = ['../Data/dSMB/' gcm '-' scen ];
 
 % MAR surface 
 d0 = ncload(['../Data/MAR/MARv3.9_topg_01000m.nc']);
 sur = d0.topg;
 
 % scenario specific 
-outfile_root_d = [ 'dSMBdz_MARv3.9-yearly-' gcm '-' scen ];
+infile_root_r = [ 'dRUNdz_MARv3.9-yearly-' gcm '-' scen ];
 lookup_file = ['trans_lookup_b25_MARv3.9-' gcm '-' scen ];
 
 % timer
@@ -65,8 +66,9 @@ for t = 1:nt % year loop
 %    t
     fprintf(['\b\b\b\b\b']);
     fprintf([sprintf('%02d',t), ',00']);
-    d1 = ncload([outpath '/' outfile_root_d  '-' num2str(time(t)) '.nc']);
-    dSMBdz = d1.dSMBdz;
+    d1 = ncload([inpath '/dRUNdz/' infile_root_r  '-' num2str(time(t)) '.nc']);
+    % based on RUNOFF gradient for remapping 
+    dSMBdz = d1.dRUNdz;
     
 %    figure
     for b = 1:nb
@@ -129,7 +131,7 @@ end % end year loop
 
 %% Write netcdf
 nz = length(ss);
-td = (1:86)*31556926;
+td = time;
 nt = length(td);
 
 % permute to get dsmb_table(h,b,t)
