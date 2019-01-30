@@ -21,10 +21,15 @@
 
 % Calculate basin weights
 
+`save_extbasin_neighbour.m`
+
 `save_extbasin_scale_div.m`
 
 
 ### Prepare MAR data (done once per scenario) 
+
+`./process_MAR_reference.sh`
+
 `matlab`
 
 % Build a forcing time series 
