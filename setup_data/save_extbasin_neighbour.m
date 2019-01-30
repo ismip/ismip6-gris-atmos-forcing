@@ -9,7 +9,7 @@ addpath('../toolbox')
 res = 5;
 
 % load basin division
-load ../Data/Basins/ExtBasinMasks25 
+load(['../Data/Basins/ExtBasinMasks25.mat']); 
 [y,x]= meshgrid(1:size(bas.basin1,2),1:size(bas.basin1,1));
 
 nx = size(y,1);
