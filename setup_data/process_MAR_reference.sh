@@ -1,3 +1,4 @@
+#!/bin/bash
 # Make SMB forcing from original MAR files 
 # Heiko Goelzer 2019 (h.goelzer@uu.nl)
 
@@ -9,13 +10,14 @@
 # MIROC5-rcp85_2006_2100/
 #	MARv3.9-yearly-MIROC5-rcp85-2006.nc
 
-datapath=/Volumes/ISMIP6/Data/Raw/SMB/MAR3.9/
+#datapath=/Volumes/ISMIP6/Data/Raw/SMB/MAR3.9/
+datapath=/work/hgoelzer/Processing/RCM/MAR3.9/
 
-gcm=MIROC5
-scen=rcp85
-
-#gcm=NorESM1
+#gcm=MIROC5
 #scen=rcp85
+
+gcm=NorESM1
+scen=rcp85
 
 mkdir -p proc
 cd proc
