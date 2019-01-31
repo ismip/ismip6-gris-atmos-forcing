@@ -67,8 +67,8 @@ for t = 1:nt % year loop
     fprintf(['\b\b\b\b\b']);
     fprintf([sprintf('%02d',t), ',00']);
     d1 = ncload([inpath '/dRUNdz/' infile_root_r  '-' num2str(time(t)) '.nc']);
-    % based on RUNOFF gradient for remapping 
-    dSMBdz = d1.dRUNdz;
+    % based on RUNOFF gradient for remapping, note negative sign 
+    dSMBdz = -d1.dRUNdz;
     
 %    figure
     for b = 1:nb

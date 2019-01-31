@@ -187,4 +187,4 @@ axis tight
 ylabel('Integrated DSMB [km^3]')
 legend({'original','reconstructed'},'Location','southeast')
 xlabel('Basin Id')
-print('-dpng', '-r300', ['../Models/' amod '/dsmb_basinint_' modscen '_re']) 
+print('-dpng', '-r300', ['../Models/' amod '/dSMBdz_basinint_' modscen '_re']) 

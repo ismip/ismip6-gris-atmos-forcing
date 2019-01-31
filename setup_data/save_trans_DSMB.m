@@ -1,5 +1,5 @@
 % Extract DSMB data
-% Here schematic interpolation in time based on end of 19th and 20th century results 
+
 clear
 
 % resolution of output files in km
