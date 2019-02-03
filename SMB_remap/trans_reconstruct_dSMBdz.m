@@ -15,7 +15,8 @@ scen = 'rcp85';
 %scen = 'rcp85';
 
 % Model
-amod = 'OBS';
+%amod = 'OBS';
+amod = 'BISICLES1';
 %amod = 'IMAUICE08';
 
 %%%%%%%
@@ -64,16 +65,21 @@ dummy0 = lookup.dSMBdz_ltbl(:,1,1);
 nc=ncload(['../Models/' amod '/orog_01000m.nc']);
 nc1=ncload(['../Models/' amod '/sftgif_01000m.nc']);
 
-% Operate on ice thickness
-%sur = nc.orog.*nc1.sftgif;
+% Load observed geometry 
+nco1=ncload(['../Models/OBS/sftgif_01000m.nc']);
+
 sur = max(0,double(nc.orog));
 
-ima = double(nc1.sftgif);
+% Masks
+ima_mod = double(nc1.sftgif);
+ima_obs = double(nco1.sftgif);
 
 nt=length(lookup.time);
 time = lookup.time;
 
-bint_out=zeros(size(lookup.bint));
+bint_obs=zeros(size(lookup.bint));
+bint_ext=zeros(size(lookup.bint));
+bint_map=zeros(size(lookup.bint));
 
 msg = (['running year, basin: 00,00']);
 fprintf(msg);
@@ -86,9 +92,11 @@ for t=1:nt % year loop
     fprintf([sprintf('%02d',t), ',00']);
     d1 = ncload([dSMBpath '/dRUNdz/' dRUNdzfile_root  '-' num2str(time(t)) '.nc']);
 
-    dSMBdz=d1.dRUNdz(:,:);
+    dSMBdz=-d1.dRUNdz(:,:);
     dSMBdz_re=zeros(size(dSMBdz));
-    bint=zeros(1,nb);
+    bint_o = zeros(1,nb);
+    bint_e = zeros(1,nb);
+    bint_m = zeros(1,nb);
 
     %% loop through basins
     for b=1:nb
@@ -97,7 +105,8 @@ for t=1:nt % year loop
         fprintf([',' sprintf('%02d',b)]);
         %% set current basin and lookup
         eval(['sur_b=sur.*(bas.basin' num2str(b) './bas.basin' num2str(b) ');']);
-        eval(['ima_b=ima.*(bas.basin' num2str(b) './bas.basin' num2str(b) ');']);
+        eval(['mask_b =       (bas.basin' num2str(b) './bas.basin' num2str(b) ');']);
+        eval(['ima_b=ima_mod.*(bas.basin' num2str(b) './bas.basin' num2str(b) ');']);
 
         %% set neighbor basin and lookup
         look0 = dummy0;
@@ -149,13 +158,22 @@ for t=1:nt % year loop
         %% replace nan by zeros to add all basins together
         dSMBdz_b(isnan(dSMBdz_b))=0;
         dSMBdz_re = dSMBdz_re+dSMBdz_b;
-        bint(b)=nansum(nansum(dSMBdz_b.*af.*ima_b))*dx*dy;
+        %% integral remapped dSMBdz for this basin
+        bint_m(b)=nansum(nansum(dSMBdz_b.*ima_b.*af))*dx*dy;
+
+        %% integral extended dSMBdz for this basin
+        bint_e(b) = nansum(nansum(dSMBdz.*ima_b.*af))*dx*dy;
+
+        %% integral observed dSMBdz for this basin
+        bint_o(b) = nansum(nansum(dSMBdz.*mask_b.*ima_obs.*af))*dx*dy;
 
     end
     %% end basin loop
 
     %% collect results
-    bint_out(:,t)=bint(:);
+    bint_obs(:,t) = bint_o(:);
+    bint_ext(:,t) = bint_e(:);
+    bint_map(:,t) = bint_m(:);
 
     %% dSMBdz [kg m-2 s-1 m-1] 
     %% write out dSMBdz
@@ -179,12 +197,21 @@ for t=1:nt % year loop
 end
 %% end time loop
 
+save(['../Models/' amod '/biastest_dSMBdz_' gcm '-' scen '-' amod ], 'bint_obs', 'bint_ext', 'bint_map');
+
 % Plot
 figure
-bar(1e-9*[lookup.bint(:,nt), bint_out(:,nt),])
+bar([mean(bint_obs,2), mean(bint_ext,2), mean(bint_map,2)]*31556926/1e12)
 axis tight
-%axis([0,26,-100,0])
-ylabel('Integrated DSMB [km^3]')
-legend({'original','reconstructed'},'Location','southeast')
+ylabel('Integrated dSMBdz [Gt yr-1 m-1]')
+legend({'observed', 'extended', 'remapped'},'Location','southeast')
 xlabel('Basin Id')
-print('-dpng', '-r300', ['../Models/' amod '/dSMBdz_basinint_' modscen '_re']) 
+print('-dpng', '-r300', ['../Models/' amod '/dSMBdz_basinint_' gcm '-' scen '_sum']) 
+
+figure
+bar([mean(bint_ext,2)-mean(bint_obs,2), mean(bint_map,2)-mean(bint_obs,2)]*31556926/1e12)
+axis tight
+ylabel('Integrated aSMB biases [Gt yr-1 m-1]')
+legend({'extended', 'remapped'},'Location','southeast')
+xlabel('Basin Id')
+print('-dpng', '-r300', ['../Models/' amod '/dSMBdz_basinint_' gcm '-' scen '_diff']) 
