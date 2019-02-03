@@ -36,3 +36,6 @@
 
 `save_trans_DSMB.m`
 
+% Average aSMB for static bias calculations
+
+`trans_mean_aSMB`
