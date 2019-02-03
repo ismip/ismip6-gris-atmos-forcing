@@ -54,7 +54,7 @@ dx=1000;dy=1000;
 load(['../Data/Basins/ExtBasinScale25_nn7_50.mat'], 'wbas');
 
 % original forcing
-lookup = ncload(['../Data/lookup/TaSMB_trans_lookup_b25_MARv3.9-' gcm '-' scen '.nc']);
+lookup = ncload(['../Data/lookup/TaSMB_mean_lookup_b25_MARv3.9-' gcm '-' scen '.nc']);
 modscen='MAR39';
 
 % dummy lookup for zero
@@ -84,7 +84,6 @@ bint_map=zeros(size(lookup.bint));
 
 msg = (['running year, basin: 00,00']);
 fprintf(msg);
-%for t=1:5 % year loop
 for t=1:nt % year loop
 
     timestamp = (time(t)-1900)*secpyear;
@@ -92,7 +91,7 @@ for t=1:nt % year loop
     fprintf(['\b\b\b\b\b']);
     fprintf([sprintf('%02d',t), ',00']);
     %% original aSMB
-    d1 = ncload([aSMBpath '/aSMB/' aSMBfile_root  '-' num2str(time(t)) '.nc']);
+    d1 = ncload([aSMBpath '/aSMB_mean/' aSMBfile_root  '-mean.nc']);
 
     aSMB = d1.aSMB(:,:);
     aSMB_re = zeros(size(aSMB));
@@ -184,7 +183,7 @@ for t=1:nt % year loop
         ylabel('Integrated aSMB [Gt yr-1]')
         legend({'observed', 'extended', 'remapped'},'Location','southeast')
         xlabel('Basin Id')
-        print('-dpng', '-r300', ['bias_' gcm '-' scen '-' amod '_' sprintf('%02d',t)]) 
+        print('-dpng', '-r300', ['biasmean_' gcm '-' scen '-' amod '_' sprintf('%02d',t)]) 
         close
     end
 
@@ -201,7 +200,7 @@ axis tight
 ylabel('Integrated aSMB [Gt yr-1]')
 legend({'observed', 'extended', 'remapped'},'Location','southeast')
 xlabel('Basin Id')
-print('-dpng', '-r300', ['bias_' gcm '-' scen '-' amod '_sum']) 
+print('-dpng', '-r300', ['biasmean_' gcm '-' scen '-' amod '_sum']) 
 
 % Plot scenario sum differences
 figure
@@ -210,4 +209,4 @@ axis tight
 ylabel('Integrated aSMB biases [Gt yr-1]')
 legend({'extended', 'remapped'},'Location','southeast')
 xlabel('Basin Id')
-print('-dpng', '-r300', ['bias_' gcm '-' scen '-' amod '_diff']) 
+print('-dpng', '-r300', ['biasmean_' gcm '-' scen '-' amod '_diff']) 
