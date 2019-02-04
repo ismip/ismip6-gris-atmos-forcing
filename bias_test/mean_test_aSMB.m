@@ -16,8 +16,12 @@ scen = 'rcp85';
 
 % Model
 %amod = 'OBS';
-amod = 'BISICLES1';
-%amod = 'IMAUICE08';
+%amod = 'BISICLES1';
+%amod = 'VUB_GISM1';
+%amod = 'MPIM_PISM';
+%amod = 'ULB_FETISH1';
+%amod = 'JPL_ISSM';
+amod = 'IMAU_IMAUICE1';
 
 %%%%%%%
 
@@ -190,6 +194,13 @@ for t=1:nt % year loop
 end
 %% end time loop
 fprintf('\n');
+
+% Some diagnostics
+disp('totals obs, ext, map');
+[ sum(bint_obs), sum(bint_ext), sum(bint_map)] 
+disp('errors ext, map')
+[ rms(bint_ext-bint_obs), rms(bint_map-bint_obs)] 
+
 
 save(['biastest_' gcm '-' scen '-' amod ], 'bint_obs', 'bint_ext', 'bint_map');
 
