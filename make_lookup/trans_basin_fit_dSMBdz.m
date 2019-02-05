@@ -1,5 +1,5 @@
-% time dependent approximation for dSMBdz
-% FOr remapping this is based on runoff gradients dRUNdz!
+% Create time dependent lookup table for dSMBdz
+% For remapping this is based on runoff gradients dRUNdz!
 
 clear
 
@@ -57,9 +57,12 @@ ns=length(ss);
 table=zeros([nb,ns,nt]);
 bint=zeros(nb,nt);
 
+oldlook = zeros(2,length(ss)+1); 
+
 msg = (['running year, basin: 00,00']);
 fprintf(msg);
 %for t = 1 % year loop
+%for t = nt % year loop
 %for t = 1:5 % year loop
 for t = 1:nt % year loop
 
@@ -108,26 +111,35 @@ for t = 1:nt % year loop
         end
         %% fill first value for h=0 from second
         look(2,1) = look(2,2);
-        if(b==12)
-            look(2,29:end) = look(2,28);
-        end
 
+        %plot(look(1,:),look(2,:),'-k')
+        %axis([0 3300 -5 2])
+        %axis([0 3300 -2 1])
+        %title(['B' num2str(bas.ids{b}) ' t:' num2str(t)])
+
+        if(flg_nanfill)
+            % if first values are zero, set neighbor basin
+            lastmatch = 0;
+            for k = 1:20 % search up 2000 m
+                if look(2,k) == 0.;
+                    lastmatch = k;
+                else
+                    break;
+                end
+            end
+            look(2,1:lastmatch) = oldlook(2,1:lastmatch); 
+            % remember
+            oldlook = look;
+        end
+    
         table(b,:,t)=look(2,:);
 
-%        plot(look(1,:),look(2,:),'-k')
-%        axis([0 3300 -5 2])
-%        axis([0 3300 -2 1])
-%        title(['B' num2str(bas.ids{b}) ' t:' num2str(t)])
-        
     end % end basin loop
+
     %% manual correction for some basins needed?
-    if(t==nt)
-        warning('Manual corrections active, check !!!'); 
-    end
-    table(9,32:end,t) = table(9,31,t);
-    table(7,35:end,t) = table(7,34,t);
 
 end % end year loop
+fprintf('\n');
 
 %% Write netcdf
 nz = length(ss);

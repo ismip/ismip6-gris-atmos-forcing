@@ -14,7 +14,7 @@ set(0,'DefaultAxesColorOrder', colororder);
 
 lookup = ncload(lookup_file);
 
-for t=1:5:85
+for t=1:5:86
 for b=1:25
     subplot(5,5,b)
     hold on; box on;
