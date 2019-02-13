@@ -13,11 +13,11 @@
 #datapath=/Volumes/ISMIP6/Data/Raw/SMB/MAR3.9/
 datapath=/work/hgoelzer/Processing/RCM/MAR3.9/
 
-#gcm=MIROC5
-#scen=rcp85
+gcm=MIROC5
+scen=rcp26
 
-gcm=NorESM1
-scen=rcp85
+#gcm=NorESM1
+#scen=rcp85
 
 mkdir -p proc
 cd proc

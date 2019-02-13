@@ -8,11 +8,12 @@ addpath('../toolbox')
 
 % Scenario
 rcm = 'MARv3.9';
-gcm = 'MIROC5';
-scen = 'rcp85';
 
-%gcm = 'NorESM1';
+%gcm = 'MIROC5';
 %scen = 'rcp85';
+
+gcm = 'NorESM1';
+scen = 'rcp85';
 
 %%%%%%%
 

@@ -6,13 +6,14 @@ clear
 res = 1;
 secpyear = 31556926;
 
-datapath = '/Volumes/ISMIP6/Data/Raw/SMB/MAR3.9';
+%datapath = '/Volumes/ISMIP6/Data/Raw/SMB/MAR3.9';
+datapath = '/work/hgoelzer/Processing/RCM/MAR3.9';
 
-gcm = 'MIROC5';
-scen = 'rcp85';
-
-%gcm = 'NorESM1';
+%gcm = 'MIROC5';
 %scen = 'rcp85';
+
+gcm = 'NorESM1';
+scen = 'rcp85';
 
 % timer
 time = 1950:2005; % needs histo srcscen below
