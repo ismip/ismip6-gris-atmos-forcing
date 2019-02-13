@@ -19,8 +19,6 @@ scen = 'rcp85';
 time = 1950:2005; % needs histo srcscen below
 %time = 1995:2005; % needs histo srcscen below
 
-%time = 2006:2014;
-%time = 2015:2100;
 %time = 2006:2100;
 
 nt = length(time);
@@ -47,7 +45,7 @@ outfile_root_d = [ 'dSTdz_MARv3.9-yearly-' gcm '-' scen ];
 addpath('../toolbox')
 
 % Load reference ST
-d0 = ncload(['../Data/MAR/MARv3.9-yearly-' gcm '-' scen '-ltm1995-2014.nc']);
+d0 = ncload(['../Data/MAR/MARv3.9-yearly-' gcm '-' scen '-ltm1960-1989.nc']);
 
 %% Time loop, scenario from 2015-2100, hist from 1950-2005, present 2006-2014
 %for t = 1:5
