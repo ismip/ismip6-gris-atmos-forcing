@@ -200,6 +200,7 @@ end
 save(['../Models/' amod '/biastest_dSMBdz_' gcm '-' scen '-' amod ], 'bint_obs', 'bint_ext', 'bint_map');
 
 % Plot
+if (flg_plot) 
 figure
 bar([mean(bint_obs,2), mean(bint_ext,2), mean(bint_map,2)]*31556926/1e12)
 axis tight
@@ -214,4 +215,5 @@ axis tight
 ylabel('Integrated aSMB biases [Gt yr-1 m-1]')
 legend({'extended', 'remapped'},'Location','southeast')
 xlabel('Basin Id')
-print('-dpng', '-r300', ['../Models/' amod '/dSMBdz_basinint_' gcm '-' scen '_diff']) 
+print('-dpng', '-r300', ['../Models/' amod '/dSMBdz_basinint_' gcm '-' scen '_diff'])
+end

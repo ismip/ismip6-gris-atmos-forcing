@@ -35,7 +35,8 @@
 % Build a forcing time series 
 
 `save_trans_DSMB.m`
+`save_trans_DT.m`
 
 % Average aSMB for static bias calculations
 
-`trans_mean_aSMB`
+`trans_mean_aSMB.m`
