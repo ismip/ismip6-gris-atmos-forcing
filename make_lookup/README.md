@@ -9,6 +9,9 @@
 `trans_basin_fit_dSMBdz.m`
 --> Data/lookup/TdSMBdz_trans_lookup_b25_<scenario>.nc
 
+## for bias calculations
+`mean_basin_fit_aSMB.m`
+
 ### Plotting
 `plot_lookup_aSMB.m`
 
