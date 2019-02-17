@@ -10,7 +10,8 @@ secpyear = 31556926;
 datapath = '/work/hgoelzer/Processing/RCM/MAR3.9';
 
 gcm = 'MIROC5';
-scen = 'rcp85';
+%scen = 'rcp85';
+scen = 'rcp26';
 
 %gcm = 'NorESM1';
 %scen = 'rcp85';
