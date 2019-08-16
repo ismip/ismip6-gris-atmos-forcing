@@ -1,14 +1,16 @@
 % Create time dependent lookup table for a given RCM simulation
+%
+%clear
 
-clear
-
-addpath('../toolbox')
+if (~isdeployed)
+  addpath('../toolbox')
+end
 
 %% Settings
-rcm = 'MARv3.9';
+%rcm = 'MARv3.9';
 
-gcm = 'MIROC5';
-scen = 'rcp85';
+%gcm = 'MIROC5';
+%scen = 'rcp85';
 
 %gcm = 'NorESM1';
 %scen = 'rcp85';
@@ -24,6 +26,12 @@ scen = 'rcp85';
 
 %gcm = 'ACCESS1.3';
 %scen = 'rcp85';
+
+%gcm = 'CNRM-CM6';
+%scen = 'ssp585';
+
+%gcm = 'CNRM-CM6';
+%scen = 'ssp126';
 
 %%%%%%%
 
@@ -50,10 +58,10 @@ sur = d0.topg;
 
 % scenario specific 
 infile_root_a = [ 'aSMB_MARv3.9-yearly-' gcm '-' scen ];
-lookup_file = ['mean_lookup_b25_MARv3.9-' gcm '-' scen ];
+lookup_file = ['trans_lookup_b25_MARv3.9-' gcm '-' scen ];
 
 % timer
-time = 0;
+time = 2015:2100;
 nt = length(time);
 
 ds = ncload('../Models/OBS/sftgif_01000m.nc');
@@ -69,14 +77,19 @@ ns=length(ss);
 table=zeros([nb,ns,nt]);
 bint=zeros(nb,nt);
 
+oldlook = zeros(2,length(ss)+1); 
+
 msg = (['running year, basin: 00,00']);
 fprintf(msg);
+%for t = 1 % year loop
+%for t = nt % year loop
+%for t = 1:5 % year loop
 for t = 1:nt % year loop
 
 %    t
     fprintf(['\b\b\b\b\b']);
     fprintf([sprintf('%02d',t), ',00']);
-    d1 = ncload([inpath '/aSMB_mean/' infile_root_a  '-mean.nc']);
+    d1 = ncload([inpath '/aSMB/' infile_root_a  '-' num2str(time(t)) '.nc']);
     aSMB = d1.aSMB;
     
 %    figure
@@ -117,26 +130,35 @@ for t = 1:nt % year loop
         end
         %% fill first value for h=0 from second
         look(2,1) = look(2,2);
-        if(b==12)
-            look(2,29:end) = look(2,28);
-        end
 
+        %plot(look(1,:),look(2,:),'-k')
+        %axis([0 3300 -5 2])
+        %axis([0 3300 -2 1])
+        %title(['B' num2str(bas.ids{b}) ' t:' num2str(t)])
+
+        if(flg_nanfill)
+            % if first values are zero, set neighbor basin
+            lastmatch = 0;
+            for k = 1:20 % search up 2000 m
+                if look(2,k) == 0.;
+                    lastmatch = k;
+                else
+                    break;
+                end
+            end
+            look(2,1:lastmatch) = oldlook(2,1:lastmatch); 
+            % remember
+            oldlook = look;
+        end
+    
         table(b,:,t)=look(2,:);
 
-%        plot(look(1,:),look(2,:),'-k')
-%        axis([0 3300 -5 2])
-%        axis([0 3300 -2 1])
-%        title(['B' num2str(bas.ids{b}) ' t:' num2str(t)])
-        
     end % end basin loop
+
     %% manual correction for some basins needed?
-    if(t==nt)
-        warning('Manual corrections active, check !!!'); 
-    end
-    table(9,32:end,t) = table(9,31,t);
-    table(7,35:end,t) = table(7,34,t);
 
 end % end year loop
+fprintf('\n');
 
 %% Write netcdf
 nz = length(ss);

@@ -9,23 +9,15 @@ secpyear = 31556926;
 %datapath = '/Volumes/ISMIP6/Data/Raw/SMB/MAR3.9';
 datapath = '/work/hgoelzer/Processing/RCM/MAR3.9';
 
-gcm = 'MIROC5';
-scen = 'rcp85';
+%gcm = 'CNRM-CM6';
+%scen = 'ssp585';
+%scen = 'ssp126';
 
-%gcm = 'NorESM1';
-%scen = 'rcp85';
+%gcm = 'UKESM1-CM6';
+%scen = 'ssp585';
 
-%gcm = 'HadGEM2-ES';
-%scen = 'rcp85';
-
-%gcm = 'CSIRO-Mk3.6';
-%scen = 'rcp85';
-
-%gcm = 'IPSL-CM5-MR';
-%scen = 'rcp85';
-
-%gcm = 'ACCESS1.3';
-%scen = 'rcp85';
+gcm = 'CNRM-ESM2';
+scen = 'ssp585';
 
 % timer
 time = 1950:2100; 
@@ -53,11 +45,11 @@ d0 = ncload(['../Data/MAR/MARv3.9-yearly-' gcm '-ltm1960-1989.nc']);
 %for t = 1:5
 for t = 1:nt 
     time(t)
-    if ( time(t) < 2006 )
-      scenpath = [ datapath '/' gcm '-histo_1950_2005'];
+    if ( time(t) < 2015 )
+      scenpath = [ datapath '/' gcm '-histo_1950_2014'];
       file_root = ['MARv3.9-yearly-' gcm '-histo-'];
     else
-      scenpath = [ datapath '/' gcm '-' scen '_2006_2100'];
+      scenpath = [ datapath '/' gcm '-' scen '_2015_2100'];
       file_root = ['MARv3.9-yearly-' gcm '-' scen '-'];
     end
 

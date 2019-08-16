@@ -1,43 +1,19 @@
-% Calculate time evolving dSMBdz at a given initial geometry
+% Calculate time evolving DST at a given initial geometry
 
-clear
+%clear
 
-addpath('../toolbox')
+if (~isdeployed)
+  addpath('../toolbox')
+end
 
 %% Settings
 
 % Scenario
 rcm = 'MARv3.9';
-
 gcm = 'MIROC5';
 scen = 'rcp85';
-
-%gcm = 'NorESM1';
-%scen = 'rcp85';
-
-%gcm = 'HadGEM2-ES';
-%scen = 'rcp85';
-
-%gcm = 'CSIRO-Mk3.6';
-%scen = 'rcp85';
-
-%gcm = 'IPSL-CM5-MR';
-%scen = 'rcp85';
-
-%gcm = 'ACCESS1.3';
-%scen = 'rcp85';
-
-%gcm = 'CNRM-CM6';
-%scen = 'ssp585';
-
-%gcm = 'CNRM-CM6';
-%scen = 'ssp126';
-
 % Model
-amod = 'OBS';
-%amod = 'BISICLES1';
-%amod = 'IMAUICE08';
-%amod = 'GSM';
+amod = 'MUN_GSM2371';
 
 %%%%%%%
 
@@ -48,13 +24,13 @@ flg_weigh = 1;
 flg_plot=0;
 load cmap_dsmb
 
-% scenario specific 
-dSMBpath = ['../Data/dSMB/' gcm '-' scen ];
-dSMBdzfile_root = [ 'dSMBdz_MARv3.9-yearly-' gcm '-' scen ];
+% scenario specific
+aSTpath = ['../Data/dST/' gcm '-' scen ];
+aSTfile_root = [ 'aST_MARv3.9-yearly-' gcm '-' scen ];
 outpath = ['../Models/' amod '/' gcm '-' scen ];
-outfile_root = [ 'dSMBdz_MARv3.9-yearly-' gcm '-' scen '-' amod ];
+outfile_root = [ 'aST_MARv3.9-yearly-' gcm '-' scen '-' amod ];
 
-mkdir(outpath, 'dSMBdz'); 
+mkdir(outpath, 'aST'); 
 
 secpyear = 31556926;
 
@@ -75,11 +51,11 @@ dx=1000;dy=1000;
 load(['../Data/Basins/ExtBasinScale25_nn7_50.mat'], 'wbas');
 
 % original forcing
-lookup = ncload(['../Data/lookup/TdSMBdz_trans_lookup_b25_MARv3.9-' gcm '-' scen '.nc']);
+lookup = ncload(['../Data/lookup/TaST_trans_lookup_b25_MARv3.9-' gcm '-' scen '.nc']);
 modscen='MAR39';
 
 % dummy lookup for zero
-dummy0 = lookup.dSMBdz_ltbl(:,1,1);
+dummy0 = lookup.aST_ltbl(:,1,1);
 
 % Load a modelled geometry for reconstruction
 nc=ncload(['../Models/' amod '/orog_01000m.nc']);
@@ -107,17 +83,18 @@ bint_map=zeros(size(lookup.bint));
 msg = (['running year, basin: 00,00']);
 fprintf(msg);
 %for t=1:5 % year loop
-for t=(nt-1):nt % year loop
 %for t=1:nt % year loop
+for t=nt:nt % year loop
 
     timestamp = (time(t)-1900)*secpyear;
 
     fprintf(['\b\b\b\b\b']);
     fprintf([sprintf('%02d',t), ',00']);
-    d1 = ncload([dSMBpath '/dSMBdz/' dSMBdzfile_root  '-' num2str(time(t)) '.nc']);
+    %% original aST
+    d1 = ncload([aSTpath '/aST/' aSTfile_root  '-' num2str(time(t)) '.nc']);
 
-    dSMBdz=-d1.dSMBdz(:,:);
-    dSMBdz_re=zeros(size(dSMBdz));
+    aST = d1.aST(:,:);
+    aST_re = zeros(size(aST));
     bint_o = zeros(1,nb);
     bint_e = zeros(1,nb);
     bint_m = zeros(1,nb);
@@ -135,62 +112,62 @@ for t=(nt-1):nt % year loop
         %% set neighbor basin and lookup
         look0 = dummy0;
         if (wbas.n0(b)>0)
-            look0=lookup.dSMBdz_ltbl(:,wbas.n0(b),t);
+            look0=lookup.aST_ltbl(:,wbas.n0(b),t);
         end
         look1 = dummy0;
         if (wbas.n1(b)>0)
-            look1=lookup.dSMBdz_ltbl(:,wbas.n1(b),t);
+            look1=lookup.aST_ltbl(:,wbas.n1(b),t);
         end
         look2 = dummy0;
         if (wbas.n2(b)>0)
-            look2=lookup.dSMBdz_ltbl(:,wbas.n2(b),t);
+            look2=lookup.aST_ltbl(:,wbas.n2(b),t);
         end
         look3 = dummy0;
         if (wbas.n3(b)>0)
-            look3=lookup.dSMBdz_ltbl(:,wbas.n3(b),t);
+            look3=lookup.aST_ltbl(:,wbas.n3(b),t);
         end
         look4 = dummy0;
         if (wbas.n4(b)>0)
-            look4=lookup.dSMBdz_ltbl(:,wbas.n4(b),t);
+            look4=lookup.aST_ltbl(:,wbas.n4(b),t);
         end
         look5 = dummy0;
         if (wbas.n5(b)>0)
-            look5=lookup.dSMBdz_ltbl(:,wbas.n5(b),t);
+            look5=lookup.aST_ltbl(:,wbas.n5(b),t);
         end
         look6 = dummy0;
         if (wbas.n6(b)>0)
-            look6=lookup.dSMBdz_ltbl(:,wbas.n6(b),t);
+            look6=lookup.aST_ltbl(:,wbas.n6(b),t);
         end
         
-        %% use lookup table to determine DSMB
-        dSMBdz_b0 = interp1(lookup.z,look0(:),sur_b);
-        dSMBdz_b1 = interp1(lookup.z,look1(:),sur_b);
-        dSMBdz_b2 = interp1(lookup.z,look2(:),sur_b);
-        dSMBdz_b3 = interp1(lookup.z,look3(:),sur_b);
-        dSMBdz_b4 = interp1(lookup.z,look4(:),sur_b);
-        dSMBdz_b5 = interp1(lookup.z,look5(:),sur_b);
-        dSMBdz_b6 = interp1(lookup.z,look6(:),sur_b);
+        %% use lookup table to determine DST
+        aST_b0 = interp1(lookup.z,look0(:),sur_b);
+        aST_b1 = interp1(lookup.z,look1(:),sur_b);
+        aST_b2 = interp1(lookup.z,look2(:),sur_b);
+        aST_b3 = interp1(lookup.z,look3(:),sur_b);
+        aST_b4 = interp1(lookup.z,look4(:),sur_b);
+        aST_b5 = interp1(lookup.z,look5(:),sur_b);
+        aST_b6 = interp1(lookup.z,look6(:),sur_b);
 
         if (flg_weigh == 0)
             %% combine according to weights
-            dSMBdz_b = dSMBdz_b0.*wbas.wg;
+            aST_b = aST_b0.*wbas.wg;
         else
-            dSMBdz_b = dSMBdz_b0.*wbas.wgc0 + dSMBdz_b1.*wbas.wgc1 + dSMBdz_b2.*wbas.wgc2 + dSMBdz_b3.*wbas.wgc3 + dSMBdz_b4.*wbas.wgc4 + dSMBdz_b5.*wbas.wgc5 + dSMBdz_b6.*wbas.wgc6;
+            aST_b = aST_b0.*wbas.wgc0 + aST_b1.*wbas.wgc1 + aST_b2.*wbas.wgc2 + aST_b3.*wbas.wgc3 + aST_b4.*wbas.wgc4 + aST_b5.*wbas.wgc5 + aST_b6.*wbas.wgc6;
         end
-%    shade(dSMBdz_b)
+%    shade(aST_b)
 
         %% replace nan by zeros to add all basins together
-        dSMBdz_b(isnan(dSMBdz_b))=0;
-        dSMBdz_re = dSMBdz_re+dSMBdz_b;
-        %% integral remapped dSMBdz for this basin
-        bint_m(b)=nansum(nansum(dSMBdz_b.*ima_b.*af))*dx*dy;
+        aST_b(isnan(aST_b)) = 0;
+        aST_re = aST_re+aST_b;
+        %% integral remapped aST for this basin
+        bint_m(b) = nansum(nansum(aST_b.*ima_b.*af))*dx*dy;
 
-        %% integral extended dSMBdz for this basin
-        bint_e(b) = nansum(nansum(dSMBdz.*ima_b.*af))*dx*dy;
+        %% integral extended aST for this basin
+        bint_e(b) = nansum(nansum(aST.*ima_b.*af))*dx*dy;
 
-        %% integral observed dSMBdz for this basin
-        bint_o(b) = nansum(nansum(dSMBdz.*mask_b.*ima_obs.*af))*dx*dy;
-
+        %% integral observed aST for this basin
+        bint_o(b) = nansum(nansum(aST.*mask_b.*ima_obs.*af))*dx*dy;
+        
     end
     %% end basin loop
 
@@ -199,20 +176,20 @@ for t=(nt-1):nt % year loop
     bint_ext(:,t) = bint_e(:);
     bint_map(:,t) = bint_m(:);
 
-    %% dSMBdz [kg m-2 s-1 m-1] 
+    %% aST [kg m-2 s-1] 
     timestamp = caldays(time(t)-1900+1,3);
     time_bounds = [caldays(time(t)-1900+1,2), caldays(time(t)-1900+2,2)];
-    %% write out dSMBdz
-    ancfile = [outpath '/dSMBdz/' outfile_root  '-' num2str(time(t)) '.nc'];
-    ncwrite_GrIS_dSMBdz(ancfile, dSMBdz_re, 'dSMBdz', {'x','y','t'}, 1, timestamp, time_bounds);
+    %% write out aST
+    ancfile = [outpath '/aST/' outfile_root  '-' num2str(time(t)) '.nc'];
+    ncwrite_GrIS_aST(ancfile, aST_re, 'aST', {'x','y','t'}, 1, timestamp, time_bounds);
 
     if (flg_plot) 
-        shade_bg(dSMBdz_re)
+        shade_bg(aST_re)
         colormap(cmap)
         caxis([-4,1])
         print('-dpng', '-r300', ['dsmb_' modscen '_re' sprintf('%02d',t)]) 
         close
-        shade_bg(dSMBdz)
+        shade_bg(aST)
         colormap(cmap)
         caxis([-4,1])
         print('-dpng', '-r300', ['dsmb_' modscen '_or' sprintf('%02d',t)]) 
@@ -223,23 +200,23 @@ for t=(nt-1):nt % year loop
 end
 %% end time loop
 
-save(['../Models/' amod '/biastest_dSMBdz_' gcm '-' scen '-' amod ], 'bint_obs', 'bint_ext', 'bint_map');
+save(['../Models/' amod '/biastest_' gcm '-' scen '-' amod ], 'bint_obs', 'bint_ext', 'bint_map');
 
 % Plot
 if (flg_plot) 
 figure
 bar([mean(bint_obs,2), mean(bint_ext,2), mean(bint_map,2)]*31556926/1e12)
 axis tight
-ylabel('Integrated dSMBdz [Gt yr-1 m-1]')
+ylabel('Integrated aST [Gt yr-1]')
 legend({'observed', 'extended', 'remapped'},'Location','southeast')
 xlabel('Basin Id')
-print('-dpng', '-r300', ['../Models/' amod '/dSMBdz_basinint_' gcm '-' scen '_sum']) 
+print('-dpng', '-r300', ['../Models/' amod '/dsmb_basinint_' gcm '-' scen '_sum']) 
 
 figure
 bar([mean(bint_ext,2)-mean(bint_obs,2), mean(bint_map,2)-mean(bint_obs,2)]*31556926/1e12)
 axis tight
-ylabel('Integrated aSMB biases [Gt yr-1 m-1]')
+ylabel('Integrated aST biases [Gt yr-1]')
 legend({'extended', 'remapped'},'Location','southeast')
 xlabel('Basin Id')
-print('-dpng', '-r300', ['../Models/' amod '/dSMBdz_basinint_' gcm '-' scen '_diff'])
+print('-dpng', '-r300', ['../Models/' amod '/dsmb_basinint_' gcm '-' scen '_diff']) 
 end

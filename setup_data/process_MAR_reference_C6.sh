@@ -6,21 +6,20 @@
 # MIROC5-histo_1950_2005/
 #	MARv3.9-yearly-MIROC5-histo-1950.nc
 
+set -x
+
 #datapath=/Volumes/ISMIP6/Data/Raw/SMB/MAR3.9/
 datapath=/work/hgoelzer/Processing/RCM/MAR3.9/
 
-gcm=MIROC5
-#gcm=NorESM1
-#gcm=CSIRO-Mk3.6
-#gcm=HadGEM2-ES
-#gcm=IPSL-CM5-MR
-#gcm=ACCESS1.3
+#gcm=CNRM-CM6
+#gcm=UKESM1-CM6
+gcm=CNRM-ESM2
 
 mkdir -p proc
 cd proc
-# Collect files from hist and rcp 
+# Collect files from hist
 for i in `seq 1960 1989`; do
-	cp ${datapath}/${gcm}-histo_1950_2005/MARv3.9-yearly-${gcm}-histo-${i}.nc ./MAR_${i}.nc
+	cp ${datapath}/${gcm}-histo_1950_2014/MARv3.9-yearly-${gcm}-histo-${i}.nc ./MAR_${i}.nc
 done
 
 # add time information 
@@ -37,8 +36,8 @@ ncrcat -O MAR_1960.nc MAR_1961.nc MAR_1962.nc MAR_1963.nc MAR_1964.nc MAR_1965.n
 ncra -O  MARv3.9-yearly-${gcm}-1960-1989.nc MARv3.9-yearly-${gcm}-ltm1960-1989.nc
 
 # Copy to destination
-/bin/cp MARv3.9-yearly-${gcm}-ltm1960-1989.nc ../../Data/MAR/
+/bin/cp MARv3.9-yearly-${gcm}-ltm1960-1989.nc /u/hgoelzer/CMIP/ISMIP6/Projections/Greenland/Processing/SMB/ismip6-gris-atmos-forcing/Data/MAR/
 
-# Extract topg
-ncks -O -v SRF MARv3.9-yearly-${gcm}-ltm1960-1989.nc ../../Data/MAR/MARv3.9_topg_01000m.nc
-ncrename -v SRF,topg ../../Data/MAR/MARv3.9_topg_01000m.nc
+## Extract topg
+#ncks -O -v SRF MARv3.9-yearly-${gcm}-ltm1960-1989.nc /u/hgoelzer/CMIP/ISMIP6/Projections/Greenland/Processing/SMB/ismip6-gris-atmos-forcing/Data/MAR/MARv3.9_topg_01000m.nc
+#ncrename -v SRF,topg /u/hgoelzer/CMIP/ISMIP6/Projections/Greenland/Processing/SMB/ismip6-gris-atmos-forcing/Data/MAR/MARv3.9_topg_01000m.nc

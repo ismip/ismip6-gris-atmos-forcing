@@ -6,11 +6,33 @@ addpath('../toolbox')
 
 %% Settings
 rcm = 'MARv3.9';
+
 gcm = 'MIROC5';
 scen = 'rcp85';
 
 %gcm = 'NorESM1';
 %scen = 'rcp85';
+
+%gcm = 'MIROC5';
+%scen = 'rcp26';
+
+%gcm = 'HadGEM2-ES';
+%scen = 'rcp85';
+
+%gcm = 'CSIRO-Mk3.6';
+%scen = 'rcp85';
+
+%gcm = 'IPSL-CM5-MR';
+%scen = 'rcp85';
+
+%gcm = 'ACCESS1.3';
+%scen = 'rcp85';
+
+%gcm = 'CNRM-CM6';
+%scen = 'ssp585';
+
+%gcm = 'CNRM-CM6';
+%scen = 'ssp126';
 
 %%%%%%%
 

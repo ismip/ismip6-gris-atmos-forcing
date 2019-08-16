@@ -1,14 +1,17 @@
-% Create time dependent lookup table for a given RCM simulation
+% Create time dependent lookup table for dSMBdz
+% For remapping this is based on runoff gradients dRUNdz!
 
-clear
+%clear
 
-addpath('../toolbox')
+if (~isdeployed)
+  addpath('../toolbox')
+end
 
 %% Settings
-rcm = 'MARv3.9';
+%rcm = 'MARv3.9';
 
-gcm = 'MIROC5';
-scen = 'rcp85';
+%gcm = 'MIROC5';
+%scen = 'rcp85';
 
 %gcm = 'NorESM1';
 %scen = 'rcp85';
@@ -24,6 +27,12 @@ scen = 'rcp85';
 
 %gcm = 'ACCESS1.3';
 %scen = 'rcp85';
+
+%gcm = 'CNRM-CM6';
+%scen = 'ssp585';
+
+%gcm = 'CNRM-CM6';
+%scen = 'ssp126';
 
 %%%%%%%
 
@@ -49,11 +58,11 @@ d0 = ncload(['../Data/MAR/MARv3.9_topg_01000m.nc']);
 sur = d0.topg;
 
 % scenario specific 
-infile_root_a = [ 'aSMB_MARv3.9-yearly-' gcm '-' scen ];
-lookup_file = ['mean_lookup_b25_MARv3.9-' gcm '-' scen ];
+infile_root_r = [ 'dSMBdz_MARv3.9-yearly-' gcm '-' scen ];
+lookup_file = ['trans_lookup_b25_MARv3.9-' gcm '-' scen ];
 
 % timer
-time = 0;
+time = 2015:2100;
 nt = length(time);
 
 ds = ncload('../Models/OBS/sftgif_01000m.nc');
@@ -69,30 +78,36 @@ ns=length(ss);
 table=zeros([nb,ns,nt]);
 bint=zeros(nb,nt);
 
+oldlook = zeros(2,length(ss)+1); 
+
 msg = (['running year, basin: 00,00']);
 fprintf(msg);
+%for t = 1 % year loop
+%for t = nt % year loop
+%for t = 1:5 % year loop
 for t = 1:nt % year loop
 
 %    t
     fprintf(['\b\b\b\b\b']);
     fprintf([sprintf('%02d',t), ',00']);
-    d1 = ncload([inpath '/aSMB_mean/' infile_root_a  '-mean.nc']);
-    aSMB = d1.aSMB;
+    d1 = ncload([inpath '/dSMBdz/' infile_root_r  '-' num2str(time(t)) '.nc']);
+    % based on RUNOFF gradient for remapping, note negative sign 
+    dSMBdz = -d1.dSMBdz;
     
 %    figure
     for b = 1:nb
         
         fprintf(['\b\b\b']);
         fprintf([',' sprintf('%02d',b)]);
-        eval(['aSMB_b=aSMB.*(bas.basin' num2str(b) './bas.basin' num2str(b) ');']);
+        eval(['dSMBdz_b=dSMBdz.*(bas.basin' num2str(b) './bas.basin' num2str(b) ');']);
         eval(['sur_b=sur.*(bas.basin' num2str(b) './bas.basin' num2str(b) ');']);
         
 %        subplot(5,4,b)
 %        hold on; box on;
-%        plot(sur_b(:),aSMB_b(:),'.');
+%        plot(sur_b(:),dSMBdz_b(:),'.');
 
         %% integral dsmb for this basin
-        bint(b,t)=nansum(nansum(aSMB_b.*af.*mask))*dx*dy;
+        bint(b,t)=nansum(nansum(dSMBdz_b.*af.*mask))*dx*dy;
         
         %% fit a lookup table to the data
         %% centers at sstep intervals with ds range
@@ -102,8 +117,8 @@ for t = 1:nt % year loop
         for s0=ss(2:end)
             n=n+1;
             %% find local average DSMB for given elevation range
-%            [y1,ysel,s1,ssel]= find_local_average(sur_b,aSMB_b,s0,ds);
-            [y1,ysel,s1,ssel]= find_local_median(sur_b,aSMB_b,s0,ds);
+%            [y1,ysel,s1,ssel]= find_local_average(sur_b,dSMBdz_b,s0,ds);
+            [y1,ysel,s1,ssel]= find_local_median(sur_b,dSMBdz_b,s0,ds);
             %% fill nans with last value
             if(isnan(y1) && flg_nanfill)
                 look(:,n)=[s0,yold];
@@ -117,26 +132,35 @@ for t = 1:nt % year loop
         end
         %% fill first value for h=0 from second
         look(2,1) = look(2,2);
-        if(b==12)
-            look(2,29:end) = look(2,28);
-        end
 
+        %plot(look(1,:),look(2,:),'-k')
+        %axis([0 3300 -5 2])
+        %axis([0 3300 -2 1])
+        %title(['B' num2str(bas.ids{b}) ' t:' num2str(t)])
+
+        if(flg_nanfill)
+            % if first values are zero, set neighbor basin
+            lastmatch = 0;
+            for k = 1:20 % search up 2000 m
+                if look(2,k) == 0.;
+                    lastmatch = k;
+                else
+                    break;
+                end
+            end
+            look(2,1:lastmatch) = oldlook(2,1:lastmatch); 
+            % remember
+            oldlook = look;
+        end
+    
         table(b,:,t)=look(2,:);
 
-%        plot(look(1,:),look(2,:),'-k')
-%        axis([0 3300 -5 2])
-%        axis([0 3300 -2 1])
-%        title(['B' num2str(bas.ids{b}) ' t:' num2str(t)])
-        
     end % end basin loop
+
     %% manual correction for some basins needed?
-    if(t==nt)
-        warning('Manual corrections active, check !!!'); 
-    end
-    table(9,32:end,t) = table(9,31,t);
-    table(7,35:end,t) = table(7,34,t);
 
 end % end year loop
+fprintf('\n');
 
 %% Write netcdf
 nz = length(ss);
@@ -147,7 +171,7 @@ nt = length(td);
 table_out = permute(table,[2,1,3]);
 
 % Write netcdf
-ancfile = ['../Data/lookup/TaSMB_' lookup_file '.nc'];
-ncwrite_TDSMBTable(ancfile,ss,td,table_out,'aSMB_ltbl',{'z','b','time'});
+ancfile = ['../Data/lookup/TdSMBdz_' lookup_file '.nc'];
+ncwrite_TDSMBTable(ancfile,ss,td,table_out,'dSMBdz_ltbl',{'z','b','time'});
 nccreate(ancfile,'bint','Dimensions',{'b',nb,'time',nt}, 'Datatype','single', 'Format','classic');
 ncwrite(ancfile,'bint',bint);

@@ -7,11 +7,33 @@ addpath('../toolbox')
 
 %% Settings
 rcm = 'MARv3.9';
+
 gcm = 'MIROC5';
 scen = 'rcp85';
 
 %gcm = 'NorESM1';
 %scen = 'rcp85';
+
+%gcm = 'MIROC5';
+%scen = 'rcp26';
+
+%gcm = 'HadGEM2-ES';
+%scen = 'rcp85';
+
+%gcm = 'CSIRO-Mk3.6';
+%scen = 'rcp85';
+
+%gcm = 'IPSL-CM5-MR';
+%scen = 'rcp85';
+
+%gcm = 'ACCESS1.3';
+%scen = 'rcp85';
+
+%gcm = 'CNRM-CM6';
+%scen = 'ssp585';
+
+%gcm = 'CNRM-CM6';
+%scen = 'ssp126';
 
 %%%%%%%
 
@@ -37,7 +59,7 @@ d0 = ncload(['../Data/MAR/MARv3.9_topg_01000m.nc']);
 sur = d0.topg;
 
 % scenario specific 
-infile_root_r = [ 'dRUNdz_MARv3.9-yearly-' gcm '-' scen ];
+infile_root_r = [ 'dSMBdz_MARv3.9-yearly-' gcm '-' scen ];
 lookup_file = ['trans_lookup_b25_MARv3.9-' gcm '-' scen ];
 
 % timer
@@ -69,9 +91,9 @@ for t = 1:nt % year loop
 %    t
     fprintf(['\b\b\b\b\b']);
     fprintf([sprintf('%02d',t), ',00']);
-    d1 = ncload([inpath '/dRUNdz/' infile_root_r  '-' num2str(time(t)) '.nc']);
+    d1 = ncload([inpath '/dSMBdz/' infile_root_r  '-' num2str(time(t)) '.nc']);
     % based on RUNOFF gradient for remapping, note negative sign 
-    dSMBdz = -d1.dRUNdz;
+    dSMBdz = -d1.dSMBdz;
     
 %    figure
     for b = 1:nb

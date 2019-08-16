@@ -1,43 +1,19 @@
 % Calculate time evolving dSMBdz at a given initial geometry
 
-clear
+%clear
 
-addpath('../toolbox')
+if (~isdeployed)
+  addpath('../toolbox')
+end
 
 %% Settings
 
 % Scenario
-rcm = 'MARv3.9';
-
-gcm = 'MIROC5';
-scen = 'rcp85';
-
-%gcm = 'NorESM1';
+%rcm = 'MARv3.9';
+%gcm = 'MIROC5';
 %scen = 'rcp85';
-
-%gcm = 'HadGEM2-ES';
-%scen = 'rcp85';
-
-%gcm = 'CSIRO-Mk3.6';
-%scen = 'rcp85';
-
-%gcm = 'IPSL-CM5-MR';
-%scen = 'rcp85';
-
-%gcm = 'ACCESS1.3';
-%scen = 'rcp85';
-
-%gcm = 'CNRM-CM6';
-%scen = 'ssp585';
-
-%gcm = 'CNRM-CM6';
-%scen = 'ssp126';
-
 % Model
-amod = 'OBS';
-%amod = 'BISICLES1';
-%amod = 'IMAUICE08';
-%amod = 'GSM';
+%amod = 'OBS';
 
 %%%%%%%
 
@@ -107,8 +83,7 @@ bint_map=zeros(size(lookup.bint));
 msg = (['running year, basin: 00,00']);
 fprintf(msg);
 %for t=1:5 % year loop
-for t=(nt-1):nt % year loop
-%for t=1:nt % year loop
+for t=1:nt % year loop
 
     timestamp = (time(t)-1900)*secpyear;
 

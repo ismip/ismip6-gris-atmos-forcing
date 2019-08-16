@@ -8,16 +8,39 @@ addpath('../toolbox')
 
 % Scenario
 rcm = 'MARv3.9';
+
 gcm = 'MIROC5';
 scen = 'rcp85';
 
 %gcm = 'NorESM1';
 %scen = 'rcp85';
 
+%gcm = 'MIROC5';
+%scen = 'rcp26';
+
+%gcm = 'HadGEM2-ES';
+%scen = 'rcp85';
+
+%gcm = 'CSIRO-Mk3.6';
+%scen = 'rcp85';
+
+%gcm = 'IPSL-CM5-MR';
+%scen = 'rcp85';
+
+%gcm = 'ACCESS1.3';
+%scen = 'rcp85';
+
+%gcm = 'CNRM-CM6';
+%scen = 'ssp585';
+
+%gcm = 'CNRM-CM6';
+%scen = 'ssp126';
+
 % Model
-%amod = 'OBS';
-amod = 'BISICLES1';
+amod = 'OBS';
+%amod = 'BISICLES1';
 %amod = 'IMAUICE08';
+%amod = 'MUN_GSM2371';
 
 %%%%%%%
 
@@ -68,6 +91,9 @@ nc1=ncload(['../Models/' amod '/sftgif_01000m.nc']);
 % Load observed geometry 
 nco1=ncload(['../Models/OBS/sftgif_01000m.nc']);
 
+% read days for time axis 
+caldays = load('../Data/Grid/days_1900-2300.txt');
+
 sur = max(0,double(nc.orog));
 
 % Masks
@@ -84,7 +110,9 @@ bint_map=zeros(size(lookup.bint));
 msg = (['running year, basin: 00,00']);
 fprintf(msg);
 %for t=1:5 % year loop
-for t=1:nt % year loop
+%for t=(nt-5):nt % year loop
+%for t=1:nt % year loop
+for t=(nt-2):nt % year loop
 
     timestamp = (time(t)-1900)*secpyear;
 
@@ -177,9 +205,11 @@ for t=1:nt % year loop
     bint_map(:,t) = bint_m(:);
 
     %% aSMB [kg m-2 s-1] 
+    timestamp = caldays(time(t)-1900+1,3);
+    time_bounds = [caldays(time(t)-1900+1,2), caldays(time(t)-1900+2,2)];
     %% write out aSMB
     ancfile = [outpath '/aSMB/' outfile_root  '-' num2str(time(t)) '.nc'];
-    ncwrite_GrIS_aSMB(ancfile, aSMB_re, 'aSMB', {'x','y','t'}, 1, timestamp);
+    ncwrite_GrIS_aSMB(ancfile, aSMB_re, 'aSMB', {'x','y','t'}, 1, timestamp, time_bounds);
 
     if (flg_plot) 
         shade_bg(aSMB_re)
