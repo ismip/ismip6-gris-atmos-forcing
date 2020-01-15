@@ -9,15 +9,18 @@ secpyear = 31556926;
 %datapath = '/Volumes/ISMIP6/Data/Raw/SMB/MAR3.9';
 datapath = '/work/hgoelzer/Processing/RCM/MAR3.9';
 
-%gcm = 'CNRM-CM6';
-%scen = 'ssp585';
+gcm = 'CNRM-CM6';
+scen = 'ssp585';
 %scen = 'ssp126';
 
 %gcm = 'UKESM1-CM6';
 %scen = 'ssp585';
 
-gcm = 'CNRM-ESM2';
-scen = 'ssp585';
+%gcm = 'CNRM-ESM2';
+%scen = 'ssp585';
+
+%gcm = 'CESM2';
+%scen = 'ssp585';
 
 % timer
 time = 1950:2100; 

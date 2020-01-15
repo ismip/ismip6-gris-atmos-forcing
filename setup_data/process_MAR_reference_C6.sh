@@ -13,7 +13,8 @@ datapath=/work/hgoelzer/Processing/RCM/MAR3.9/
 
 #gcm=CNRM-CM6
 #gcm=UKESM1-CM6
-gcm=CNRM-ESM2
+#gcm=CNRM-ESM2
+gcm=CESM2
 
 mkdir -p proc
 cd proc
