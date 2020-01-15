@@ -4,23 +4,23 @@
 % RCM
 rcm = 'MARv3.9';
 
-% Scenario
+%% Scenario
 gcm = 'MIROC5';
 scen = 'rcp85';
 trans_basin_fit_aST_func
-%
+
 %gcm = 'NorESM1';
 %scen = 'rcp85';
 %trans_basin_fit_aST_func
-%
+
 %gcm = 'MIROC5';
 %scen = 'rcp26';
 %trans_basin_fit_aST_func
-%
+
 %gcm = 'HadGEM2-ES';
 %scen = 'rcp85';
 %trans_basin_fit_aST_func
-%
+
 %gcm = 'CSIRO-Mk3.6';
 %scen = 'rcp85';
 %trans_basin_fit_aST_func

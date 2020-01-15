@@ -1,6 +1,5 @@
 % Plot the lookup tables
 
-%lookup_file='../Data/lookup/TdSMBdz_trans_lookup_MAR37_b25.nc';
 lookup_file='../Data/lookup/TdSMBdz_trans_lookup_b25_MARv3.9-MIROC5-rcp85.nc';
 
 % basin definition

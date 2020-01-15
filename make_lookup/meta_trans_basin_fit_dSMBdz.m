@@ -8,7 +8,7 @@ rcm = 'MARv3.9';
 gcm = 'MIROC5';
 scen = 'rcp85';
 trans_basin_fit_dSMBdz_func
-%
+
 %gcm = 'NorESM1';
 %scen = 'rcp85';
 %trans_basin_fit_dSMBdz_func
@@ -20,7 +20,7 @@ trans_basin_fit_dSMBdz_func
 %gcm = 'HadGEM2-ES';
 %scen = 'rcp85';
 %trans_basin_fit_dSMBdz_func
-%
+
 %gcm = 'CSIRO-Mk3.6';
 %scen = 'rcp85';
 %trans_basin_fit_dSMBdz_func
